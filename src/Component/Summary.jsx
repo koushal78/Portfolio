@@ -8,9 +8,9 @@ const Summary = () => {
       ];
   return (
     <div className="flex  flex-col items-center">
-       <div className="w-full bg-yellow-100 text-yellow-800 text-center text-sm py-2 z-50">
+       {/* <div className="w-full bg-yellow-100 text-yellow-800 text-center text-sm py-2 z-50">
   🚧 This portfolio is currently under development. Updates are coming soon!
-</div>
+</div> */}
           <p className="text-3xl sm:text-4xl max-w-[400px] lg:text-[60px] tracking-wide text-white font-bold mt-8 text-center mx-4">
           Transforming Your Ideas into 
           <span className="text-purple-800"> Reality</span>

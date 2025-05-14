@@ -1,7 +1,14 @@
-
 import { useEffect } from 'react';
+
 const FollowCursor = ({ color = '#323232a6' }) => {
   useEffect(() => {
+    // Only proceed if this is not a touch-only device
+    // We can detect this by checking if pointer events are supported
+    if (window.matchMedia('(pointer: coarse)').matches && !window.matchMedia('(pointer: fine)').matches) {
+      console.log('Touch-only device detected, cursor effect disabled.');
+      return;
+    }
+
     let canvas;
     let context;
     let animationFrame;
@@ -11,6 +18,7 @@ const FollowCursor = ({ color = '#323232a6' }) => {
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     );
+
     class Dot {
       position;
       width;
@@ -20,6 +28,7 @@ const FollowCursor = ({ color = '#323232a6' }) => {
         this.width = width;
         this.lag = lag;
       }
+
       moveTowards(x, y, context) {
         this.position.x += (x - this.position.x) / this.lag;
         this.position.y += (y - this.position.y) / this.lag;
@@ -39,11 +48,17 @@ const FollowCursor = ({ color = '#323232a6' }) => {
         context.stroke();
       }
     }
+
     const dot = new Dot(width / 2, height / 2, 10, 10);
+
     const onMouseMove = (e) => {
-      cursor.x = e.clientX;
-      cursor.y = e.clientY;
+      // Only update cursor for mouse events, not touch events
+      if (e.pointerType === 'mouse' || !e.pointerType) {
+        cursor.x = e.clientX;
+        cursor.y = e.clientY;
+      }
     };
+
     const onWindowResize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
@@ -52,21 +67,25 @@ const FollowCursor = ({ color = '#323232a6' }) => {
         canvas.height = height;
       }
     };
+
     const updateDot = () => {
       if (context) {
         context.clearRect(0, 0, width, height);
         dot.moveTowards(cursor.x, cursor.y, context);
       }
     };
+
     const loop = () => {
       updateDot();
       animationFrame = requestAnimationFrame(loop);
     };
+
     const init = () => {
       if (prefersReducedMotion.matches) {
         console.log('Reduced motion enabled, cursor effect skipped.');
         return;
       }
+
       canvas = document.createElement('canvas');
       context = canvas.getContext('2d');
       canvas.style.position = 'fixed';
@@ -76,16 +95,20 @@ const FollowCursor = ({ color = '#323232a6' }) => {
       canvas.width = width;
       canvas.height = height;
       document.body.appendChild(canvas);
-      window.addEventListener('mousemove', onMouseMove);
+
+      // Use pointer events instead of mouse events for better device detection
+      window.addEventListener('pointermove', onMouseMove);
       window.addEventListener('resize', onWindowResize);
       loop();
     };
+
     const destroy = () => {
       if (canvas) canvas.remove();
       cancelAnimationFrame(animationFrame);
-      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('pointermove', onMouseMove);
       window.removeEventListener('resize', onWindowResize);
     };
+
     prefersReducedMotion.onchange = () => {
       if (prefersReducedMotion.matches) {
         destroy();
@@ -93,11 +116,14 @@ const FollowCursor = ({ color = '#323232a6' }) => {
         init();
       }
     };
+
     init();
     return () => {
       destroy();
     };
   }, [color]);
+
   return null;
 };
+
 export default FollowCursor;

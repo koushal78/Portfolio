@@ -37,7 +37,10 @@ function App() {
 
   return (
     <>
+    <div className="">
+
       <FollowCursor color="#5e5c5c92"  />
+    </div>
       {loading ? (
         <div className="text-purple-700 w-screen bg-black h-screen flex items-center justify-center">
           <HashLoader color="purple" />
